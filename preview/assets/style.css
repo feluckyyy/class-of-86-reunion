@@ -125,8 +125,69 @@ body.noscroll{overflow:hidden}
 .film-meta{padding:12px 0 0}
 .film-ep{display:block;font-size:10px;letter-spacing:3.2px;color:var(--rust);line-height:1}
 .film-meta h4{font-family:var(--serif);font-weight:600;font-size:17px;color:var(--ink);margin-top:7px;letter-spacing:.4px;line-height:1.4}
-.film-bl{display:inline-flex;align-items:center;margin-top:10px;height:32px;padding:0 12px;font-size:12px;color:var(--ink2);border:1.5px solid var(--tab);border-radius:999px;letter-spacing:.2px}
-.film-bl:active{opacity:.75}
-.film-cover.playing{cursor:default}
+.film-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.film-bl,.film-fs{display:inline-flex;align-items:center;height:32px;padding:0 12px;font-size:12px;color:var(--ink2);border:1.5px solid var(--tab);border-radius:999px;letter-spacing:.2px;background:none}
+.film-fs{color:var(--ink);border-color:var(--ink)}
+.film-bl:active,.film-fs:active{opacity:.75}
+.film-cover.playing{cursor:default;overflow:visible;transform:none;filter:none;contain:none;will-change:auto}
 .film-cover.playing::after{display:none}
 .film-cover iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#000}
+/* neutralize ancestors that can block Fullscreen API / iOS FS */
+body.film-playing .book,
+body.film-fs-open .book{
+  overflow:visible;
+  transform:none;
+  filter:none;
+  contain:none;
+  will-change:auto;
+}
+
+/* site-own fullscreen overlay (iOS / WeChat fallback) */
+.film-overlay{position:fixed;inset:0;z-index:400;width:100vw;height:100vh;height:100dvh;background:#000;display:none}
+.film-overlay.open{display:block}
+.film-overlay-close{position:fixed;top:max(12px,calc(env(safe-area-inset-top,0px) + 8px));right:max(12px,calc(env(safe-area-inset-right,0px) + 8px));z-index:402;width:44px;height:44px;border-radius:50%;background:rgba(245,240,230,.92);color:#1a1c18;font-size:22px;line-height:44px;text-align:center;border:0;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.film-overlay-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.film-overlay-stage iframe{border:0;display:block;background:#000;max-width:100%;max-height:100%}
+@media (orientation:portrait){
+  .film-overlay-stage{top:50%;left:50%;right:auto;bottom:auto;width:100dvh;height:100vw;inset:auto;transform:translate(-50%,-50%) rotate(90deg);transform-origin:center center}
+}
+@media (orientation:landscape){
+  .film-overlay-stage{inset:0;width:auto;height:auto;transform:none}
+}
+
+/* desktop layout — mobile styles above stay unchanged */
+@media (min-width:768px){
+  .book{max-width:1100px;margin:32px auto 0;border-radius:24px 24px 0 0;box-shadow:0 2px 30px rgba(0,0,0,.05)}
+  .top{padding:24px 48px 22px}
+  .brand h1{font-size:28px;letter-spacing:4px}
+  .brand p{font-size:11px;margin-top:8px}
+  .hero{padding:56px 48px 56px}
+  .hero h2{font-size:52px;line-height:1.4;margin-top:18px}
+  .hero .lead{font-size:16px}
+  .hero .intro{font-size:16px;line-height:2;max-width:28em}
+  .polaroid-wrap{max-width:640px;margin:36px auto 0}
+  .cta,.more{max-width:400px}
+  .hero .school{font-size:11px}
+  .sec{padding:56px 48px}
+  .sec h3{font-size:36px;margin-top:20px}
+  .quote{font-size:24px;margin-top:34px}
+  .timeline .yr{font-size:40px;width:110px}
+  .timeline b{font-size:17px}
+  .sub{font-size:14px}
+  .album-head .count{font-size:13px}
+  .tabs{max-width:420px}
+  .grid{grid-template-columns:repeat(4,1fr);gap:0 18px;margin-top:28px}
+  .card.big{grid-column:span 2}
+  .card p{font-size:13.5px;padding:12px 0 22px}
+  .films{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 24px;margin-top:32px}
+  .film-meta h4{font-size:18px}
+  .foot{padding:56px 48px 64px}
+  .foot .t{font-size:24px}
+  .gsec{padding:36px 48px 8px}
+  .group{padding:32px 48px 8px}
+  .jump{padding:18px 48px 16px}
+  .thumbs{grid-template-columns:repeat(6,1fr);gap:6px}
+}
+@media (min-width:1024px){
+  .thumbs{grid-template-columns:repeat(8,1fr)}
+}
