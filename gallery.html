@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e6">
+<title>全部照片 · 老同学 · 肇源一中八六届高三二班</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<main class="book">
+  <div class="gtop">
+    <header class="top">
+      <div class="brand">
+        <h1>老同学</h1>
+        <p>八六届二班 · 四十周年</p>
+      </div>
+      <a class="pill back" href="index.html">← 回到首页</a>
+    </header>
+    <nav class="jump" id="jump"></nav>
+  </div>
+  <section class="gsec">
+    <div class="eyebrow">02 / 把这一刻留下</div>
+    <div class="album-head"><h3>全部照片</h3><span class="count">236 张</span></div>
+    <p class="sub">点开一张照片，左右滑动，慢慢看。</p>
+  </section>
+  <div id="groups"></div>
+  <footer class="foot">
+    <div class="t">同窗三载，一生知己。</div>
+    <div class="eyebrow">肇源一中 · 高三二班 · 1986 — 2026</div>
+    <a class="totop" href="index.html">← 回到首页</a>
+  </footer>
+</main>
+<script src="assets/photos.js"></script>
+<script src="assets/lightbox.js"></script>
+<script>
+(function(){
+  var P=window.PHOTOS,groups=[],map={};
+  P.forEach(function(p,i){if(!map[p[3]]){map[p[3]]={name:p[3],items:[]};groups.push(map[p[3]]);}map[p[3]].items.push(i);});
+  var pad=function(n){return ('000'+n).slice(-4);};
+  var list=P.map(function(p){return {src:'assets/full/'+pad(p[0])+'.jpg',cap:p[3]};});
+  var jump=document.getElementById('jump'),box=document.getElementById('groups'),frag=document.createDocumentFragment();
+  groups.forEach(function(g,gi){
+    var a=document.createElement('a');a.href='#g'+gi;a.textContent=g.name+' · '+g.items.length;if(gi===0)a.className='on';jump.appendChild(a);
+    var s=document.createElement('section');s.className='group';s.id='g'+gi;
+    s.innerHTML='<h4>'+g.name+'<small>'+g.items.length+' 张</small></h4>';
+    var t=document.createElement('div');t.className='thumbs';
+    g.items.forEach(function(i){var b=document.createElement('button');b.type='button';b.dataset.i=i;b.setAttribute('aria-label','查看第'+(i+1)+'张');
+      var im=document.createElement('img');im.alt='';im.decoding='async';im.loading='lazy';im.dataset.src='assets/thumb/'+pad(P[i][0])+'.jpg';
+      im.onload=function(){im.classList.add('ld');};b.appendChild(im);t.appendChild(b);});
+    s.appendChild(t);frag.appendChild(s);
+  });
+  box.appendChild(frag);
+  // lazy load thumbnails
+  var imgs=[].slice.call(box.querySelectorAll('img[data-src]'));
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var im=e.target;im.src=im.dataset.src;io.unobserve(im);}});},{rootMargin:'600px 0px'});
+    imgs.forEach(function(im){io.observe(im);});
+  } else imgs.forEach(function(im){im.src=im.dataset.src;});
+  box.addEventListener('click',function(e){var b=e.target.closest('button[data-i]');if(b)Lightbox.open(list,+b.dataset.i);});
+  // highlight current group chip
+  var chips=[].slice.call(jump.children),secs=[].slice.call(box.children);
+  window.addEventListener('scroll',function(){var y=window.scrollY+170,cur=0;secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i;});
+    chips.forEach(function(c,i){var on=i===cur;if(on!==c.classList.contains('on')){c.classList.toggle('on',on);if(on)jump.scrollTo({left:c.offsetLeft-24,behavior:'smooth'});}});},{passive:true});
+  jump.addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();var t=document.querySelector(a.getAttribute('href'));window.scrollTo({top:t.offsetTop-130,behavior:'smooth'});});
+})();
+</script>
+</body>
+</html>
