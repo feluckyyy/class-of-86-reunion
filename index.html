@@ -180,12 +180,83 @@
     <div class="credit">《老同学》 · 作词作曲：马立群</div>
   </section>
 
+
+  <section class="sec" id="films">
+    <div class="eyebrow">04 / 把这一天留下</div>
+    <div class="album-head"><h3>聚会影像</h3><span class="count">3 段 · 2 小时 08 分</span></div>
+    <p class="sub">三段纪录，按顺序把重逢的日子看完。</p>
+    <div class="films">
+      <article class="film" data-bvid="BV1MWsN6bEzf">
+        <div class="film-cover" role="button" tabindex="0" data-cover="assets/video/cover1.jpg" data-title="40周年聚会视频（一）" data-dur="44:02" data-play-label="播放第一集" aria-label="播放第一集">
+          <img src="assets/video/cover1.jpg" alt="40周年聚会视频（一）" decoding="async">
+          <span class="film-play" aria-hidden="true">
+            <span class="film-play-btn">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 6.5v11l9-5.5z" fill="currentColor"/></svg>
+            </span>
+          </span>
+          <span class="film-dur">44:02</span>
+        </div>
+        <div class="film-meta">
+          <span class="film-ep">第一集</span>
+          <h4>40周年聚会视频（一）</h4>
+          <div class="film-actions">
+            <a class="film-bl" href="https://www.bilibili.com/video/BV1MWsN6bEzf/" target="_blank" rel="noopener noreferrer">去 B 站看高清 ↗</a>
+            <button class="film-fs" type="button">全屏观看</button>
+          </div>
+        </div>
+      </article>
+      <article class="film" data-bvid="BV1MWsN6bEhK">
+        <div class="film-cover" role="button" tabindex="0" data-cover="assets/video/cover2.jpg" data-title="40周年聚会视频（二）" data-dur="29:50" data-play-label="播放第二集" aria-label="播放第二集">
+          <img src="assets/video/cover2.jpg" alt="40周年聚会视频（二）" decoding="async">
+          <span class="film-play" aria-hidden="true">
+            <span class="film-play-btn">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 6.5v11l9-5.5z" fill="currentColor"/></svg>
+            </span>
+          </span>
+          <span class="film-dur">29:50</span>
+        </div>
+        <div class="film-meta">
+          <span class="film-ep">第二集</span>
+          <h4>40周年聚会视频（二）</h4>
+          <div class="film-actions">
+            <a class="film-bl" href="https://www.bilibili.com/video/BV1MWsN6bEhK/" target="_blank" rel="noopener noreferrer">去 B 站看高清 ↗</a>
+            <button class="film-fs" type="button">全屏观看</button>
+          </div>
+        </div>
+      </article>
+      <article class="film" data-bvid="BV1bWsN6bErP">
+        <div class="film-cover" role="button" tabindex="0" data-cover="assets/video/cover3.jpg" data-title="40周年聚会视频（三）" data-dur="53:56" data-play-label="播放第三集" aria-label="播放第三集">
+          <img src="assets/video/cover3.jpg" alt="40周年聚会视频（三）" decoding="async">
+          <span class="film-play" aria-hidden="true">
+            <span class="film-play-btn">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 6.5v11l9-5.5z" fill="currentColor"/></svg>
+            </span>
+          </span>
+          <span class="film-dur">53:56</span>
+        </div>
+        <div class="film-meta">
+          <span class="film-ep">第三集</span>
+          <h4>40周年聚会视频（三）</h4>
+          <div class="film-actions">
+            <a class="film-bl" href="https://www.bilibili.com/video/BV1bWsN6bErP/" target="_blank" rel="noopener noreferrer">去 B 站看高清 ↗</a>
+            <button class="film-fs" type="button">全屏观看</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
   <footer class="foot">
     <div class="t">同窗三载，一生知己。</div>
     <div class="eyebrow">肇源一中 · 高三二班 · 1986 — 2026</div>
     <a class="totop" href="#home">回到封面 ↑</a>
   </footer>
 </main>
+
+<div class="film-overlay" id="filmOverlay" hidden aria-hidden="true">
+  <button class="film-overlay-close" type="button" aria-label="关闭全屏">✕</button>
+  <div class="film-overlay-stage" id="filmOverlayStage"></div>
+</div>
 
 <script src="assets/lightbox.js"></script>
 <script>
@@ -212,6 +283,187 @@
     Lightbox.open(list,vis.indexOf(c));
   });});
   // only one video
+  // reunion films: tap cover -> Bilibili iframe; 全屏观看 uses a site overlay
+  (function(){
+    var covers = document.querySelectorAll('#films .film-cover');
+    var overlay = document.getElementById('filmOverlay');
+    var stage = document.getElementById('filmOverlayStage');
+    var closeBtn = overlay && overlay.querySelector('.film-overlay-close');
+    var overlayOpen = false;
+    var overlayFilm = null;
+    var savedScroll = 0;
+
+    function playerSrc(bvid){
+      return 'https://player.bilibili.com/player.html?isOutside=true&bvid='+encodeURIComponent(bvid)+'&page=1&autoplay=1&high_quality=1&danmaku=0';
+    }
+    function iframeHTML(bvid, title){
+      return '<iframe src="'+playerSrc(bvid)+'" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" scrolling="no" frameborder="0" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" title="'+(title||'')+'"></iframe>';
+    }
+    function posterHTML(el){
+      var src = el.getAttribute('data-cover');
+      var title = el.getAttribute('data-title') || '';
+      var dur = el.getAttribute('data-dur') || '';
+      return '<img src="'+src+'" alt="'+title+'" decoding="async">'
+        + '<span class="film-play" aria-hidden="true"><span class="film-play-btn">'
+        + '<svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 6.5v11l9-5.5z" fill="currentColor"/></svg>'
+        + '</span></span>'
+        + '<span class="film-dur">'+dur+'</span>';
+    }
+    function anyPlaying(){
+      return document.querySelector('#films .film-cover.playing');
+    }
+    function syncPlayingClass(){
+      document.body.classList.toggle('film-playing', !!anyPlaying() || overlayOpen);
+    }
+    function stop(el){
+      if(!el.classList.contains('playing')) return;
+      el.classList.remove('playing');
+      el.innerHTML = posterHTML(el);
+      el.setAttribute('role','button');
+      el.setAttribute('tabindex','0');
+      el.setAttribute('aria-label', el.getAttribute('data-play-label') || '播放');
+    }
+    function pauseSong(){
+      var song = document.querySelector('#song video');
+      if(song && !song.paused) try{ song.pause(); }catch(e){}
+    }
+    function stopAll(){
+      covers.forEach(stop);
+      pauseSong();
+      syncPlayingClass();
+    }
+    function play(el){
+      if(el.classList.contains('playing')) return;
+      stopAll();
+      var film = el.closest('.film');
+      var bvid = film && film.getAttribute('data-bvid');
+      if(!bvid) return;
+      el.classList.add('playing');
+      el.removeAttribute('role');
+      el.removeAttribute('tabindex');
+      el.removeAttribute('aria-label');
+      el.innerHTML = iframeHTML(bvid, el.getAttribute('data-title')||'');
+      syncPlayingClass();
+    }
+    function sizeStage(){
+      if(!stage) return;
+      var iframe = stage.querySelector('iframe');
+      if(!iframe) return;
+      var w = stage.clientWidth, h = stage.clientHeight;
+      if(!w || !h) return;
+      var iw, ih;
+      if(w / h > 16/9){ ih = h; iw = h * 16/9; }
+      else { iw = w; ih = w * 9/16; }
+      iframe.style.width = Math.round(iw) + 'px';
+      iframe.style.height = Math.round(ih) + 'px';
+    }
+    function isNativeFs(){
+      return document.fullscreenElement || document.webkitFullscreenElement;
+    }
+    function requestFs(el){
+      var fn = el.requestFullscreen || el.webkitRequestFullscreen || el.webkitRequestFullScreen;
+      if(!fn) return;
+      try{
+        var p = fn.call(el);
+        if(p && p.catch) p.catch(function(){});
+      }catch(e){}
+    }
+    function exitFs(){
+      if(!isNativeFs()) return;
+      var fn = document.exitFullscreen || document.webkitExitFullscreen;
+      if(!fn) return;
+      try{
+        var p = fn.call(document);
+        if(p && p.catch) p.catch(function(){});
+      }catch(e){}
+    }
+    function lockScroll(){
+      savedScroll = window.scrollY || window.pageYOffset || 0;
+      document.body.classList.add('film-fs-open','noscroll');
+      document.body.style.position = 'fixed';
+      document.body.style.top = '-' + savedScroll + 'px';
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    }
+    function unlockScroll(){
+      document.body.classList.remove('film-fs-open','noscroll');
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      window.scrollTo(0, savedScroll);
+    }
+    function closeOverlay(){
+      if(!overlayOpen) return;
+      overlayOpen = false;
+      var film = overlayFilm;
+      overlayFilm = null;
+      exitFs();
+      if(stage) stage.innerHTML = '';
+      if(overlay){
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden','true');
+        overlay.classList.remove('open');
+      }
+      unlockScroll();
+      if(film){
+        var cover = film.querySelector('.film-cover');
+        if(cover && !cover.classList.contains('playing')) play(cover);
+      }
+      syncPlayingClass();
+    }
+    function openOverlay(film){
+      if(!film || !overlay) return;
+      var bvid = film.getAttribute('data-bvid');
+      var cover = film.querySelector('.film-cover');
+      var title = (cover && cover.getAttribute('data-title')) || '';
+      if(!bvid) return;
+      pauseSong();
+      // only one player: clear inline iframe first
+      covers.forEach(function(el){
+        if(el.classList.contains('playing')) stop(el);
+      });
+      overlayFilm = film;
+      overlayOpen = true;
+      stage.innerHTML = iframeHTML(bvid, title);
+      overlay.hidden = false;
+      overlay.setAttribute('aria-hidden','false');
+      overlay.classList.add('open');
+      lockScroll();
+      syncPlayingClass();
+      sizeStage();
+      requestAnimationFrame(function(){ sizeStage(); requestFs(overlay); });
+      if(closeBtn) try{ closeBtn.focus(); }catch(e){}
+    }
+
+    covers.forEach(function(el){
+      el.addEventListener('click', function(){ play(el); });
+      el.addEventListener('keydown', function(e){
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); play(el); }
+      });
+    });
+    document.querySelectorAll('#films .film-fs').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var film = btn.closest('.film');
+        if(film) openOverlay(film);
+      });
+    });
+    if(closeBtn) closeBtn.addEventListener('click', function(){ closeOverlay(); });
+    document.addEventListener('keydown', function(e){
+      if(e.key==='Escape' && overlayOpen){ e.preventDefault(); closeOverlay(); }
+    });
+    function onFsChange(){
+      if(overlayOpen && !isNativeFs()){
+        closeOverlay();
+      }
+    }
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    window.addEventListener('resize', function(){ if(overlayOpen) sizeStage(); });
+    window.addEventListener('orientationchange', function(){ setTimeout(sizeStage, 80); });
+  })();
 })();
 </script>
 </body>
